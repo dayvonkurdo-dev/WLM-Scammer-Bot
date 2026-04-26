@@ -233,4 +233,13 @@ async def web_server():
     await runner.setup()
     site = web.TCPSite(runner, '0.0.0.0', 5000)
     await site.start()
+@tree.command(name="clear", description="Delete messages (Admin only)")
+@app_commands.describe(amount="Number of messages to delete")
+async def clear(interaction: discord.Interaction, amount: int):
+    if interaction.user.guild_permissions.manage_messages:
+        await interaction.response.defer(ephemeral=True)
+        deleted = await interaction.channel.purge(limit=amount)
+        await interaction.followup.send(f"✅ Deleted {len(deleted)} messages!", ephemeral=True)
+    else:
+        await interaction.response.send_message("❌ Only admins can use this command!", ephemeral=True)
 client.run(TOKEN)
