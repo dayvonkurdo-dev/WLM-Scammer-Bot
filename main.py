@@ -244,5 +244,31 @@ async def on_ready():
     await tree.sync()
     await web_server()
     print(f'✅ Bot is online as {client.user}')
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
+BOT_COMMANDS_CHANNEL_ID = 1495457048404562072
 
+@client.event
+async def on_message(message):
+    if message.author.bot:
+        return
+    if message.channel.id != BOT_COMMANDS_CHANNEL_ID:
+        return
+    
+    prompt = f"""You are WLM Bot, the official assistant of WE LUV MONEY Discord server - a marketplace server where people buy and sell services and products. 
+    Answer helpfully about: server rules, how to buy/sell, how to report scammers, how to leave reviews, marketplace tips.
+    Keep answers short and friendly. Use emojis.
+    User question: {message.content}"""
+    
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={GEMINI_API_KEY}"
+    data = json.dumps({"contents": [{"parts": [{"text": prompt}]}]}).encode()
+    req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
+    
+    async with message.channel.typing():
+        try:
+            response = urllib.request.urlopen(req)
+            result = json.loads(response.read())
+            reply = result["candidates"][0]["content"]["parts"][0]["text"]
+            await message.reply(reply)
+        except:
+            await message.reply("❌ Sorry, I couldn't process that. Try again!")
 client.run(TOKEN)
