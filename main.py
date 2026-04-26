@@ -6,6 +6,8 @@ from aiohttp import web
 import asyncio
 from datetime import datetime
 import os
+import urllib.request
+import json
 
 TOKEN = os.environ.get('TOKEN')
 SCAMMER_CHANNEL_ID = 1495457069321556018
