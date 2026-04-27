@@ -233,6 +233,15 @@ async def web_server():
     await runner.setup()
     site = web.TCPSite(runner, '0.0.0.0', 5000)
     await site.start()
+    @client.event
+async def on_ready():
+    client.add_view(ReportView())
+    client.add_view(VerifyView())
+    client.add_view(ReviewView())
+    client.add_view(IntroView())
+    await tree.sync()
+    await web_server()
+    print(f'✅ Bot is online as {client.user}')
 @tree.command(name="clear", description="Delete messages (Admin only)")
 @app_commands.describe(amount="Number of messages to delete")
 async def clear(interaction: discord.Interaction, amount: int):
